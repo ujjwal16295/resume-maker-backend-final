@@ -14,11 +14,7 @@ const PORT = process.env.PORT || 3001;
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 // Configure CORS with specific options
-app.use(cors({
-  origin:['http://localhost:3000', 'http://localhost:3001',"https://resume-maker-frontend-lvgt.vercel.app/"],
-  credentials: true,
-  optionsSuccessStatus: 200
-}));
+app.use(cors()); // Allow all origins, no credentials
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
