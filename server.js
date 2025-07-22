@@ -184,12 +184,12 @@ async function convertHTMLtoPDF(htmlContent) {
     }
   }
   
-  async function getGeminiSuggestionsWithPDF(filePath, jobRequirements, extraInfo = '') {
+  // Helper function to call Gemini AI with PDF
+  async function getGeminiSuggestionsWithPDF(filePath, jobRequirements) {
     try {
       console.log('Calling Gemini AI with PDF...');
       
-      // Build the base prompt
-      let prompt = `
+      const prompt = `
   You are an expert resume optimizer and designer. I will provide you with a resume PDF and job requirements. 
   Your task is to analyze the resume and create a completely optimized, professional, and visually appealing ONE-PAGE resume in HTML format.
   
@@ -229,23 +229,6 @@ async function convertHTMLtoPDF(htmlContent) {
   
   JOB REQUIREMENTS:
   ${jobRequirements}
-  `;
-  
-      // Add extra customization info if provided
-      if (extraInfo && extraInfo.trim()) {
-        prompt += `
-  
-  ADDITIONAL CUSTOMIZATION REQUIREMENTS:
-  The user has provided specific preferences for their resume optimization. Please incorporate these preferences while maintaining all the above requirements:
-  
-  ${extraInfo.trim()}
-  
-  Please ensure these customization requests are implemented while still maintaining the professional quality and one-page constraint.
-  `;
-      }
-  
-      // Complete the prompt
-      prompt += `
   
   IMPORTANT: Your response must be in this exact JSON format:
   {
@@ -318,7 +301,7 @@ app.get('/api/health', (req, res) => {
 // Main endpoint for resume optimization
 app.post('/api/optimize-resume', upload.single('resume'), async (req, res) => {
   try {
-    const { jobRequirements, extraInfo } = req.body;
+    const { jobRequirements } = req.body;
     
     console.log('Received resume optimization request');
     
@@ -333,16 +316,11 @@ app.post('/api/optimize-resume', upload.single('resume'), async (req, res) => {
     console.log('Processing PDF resume optimization...');
     console.log('File path:', req.file.path);
     console.log('Job requirements length:', jobRequirements.length);
-    console.log('Extra info provided:', extraInfo ? 'Yes' : 'No');
-    if (extraInfo) {
-      console.log('Extra info length:', extraInfo.length);
-    }
     
     // Get AI suggestions by sending PDF directly to Gemini
     const suggestions = await getGeminiSuggestionsWithPDF(
       req.file.path, 
-      jobRequirements,
-      extraInfo || '' // Pass extra info or empty string if not provided
+      jobRequirements
     );
     
     console.log('AI suggestions received');
